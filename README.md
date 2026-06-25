@@ -100,6 +100,124 @@ Three user roles are supported.
 
 ---
 
+# 🧪 Demo Credentials
+
+ScholarFlow includes pre-configured accounts for testing different user roles.
+
+> **Live Application:** https://scholarflow-frontend-phi.vercel.app/
+
+---
+
+## 👨‍💼 Administrator
+
+| Field | Value |
+|--------|-------|
+| Name | Kakshil Kumar |
+| Email | test@learner.con |
+| Role | ADMIN |
+| Password | *Use the password configured during setup* |
+
+### Features Available
+
+- Platform Dashboard
+- User Management
+- Course Management
+- Revenue Analytics
+- Enrollment Analytics
+- Platform Statistics
+
+---
+
+## 👨‍🏫 Instructor
+
+| Field | Value |
+|--------|-------|
+| Name | Teacher |
+| Email | teacher@test.com |
+| Role | INSTRUCTOR |
+| Password | *Use the password configured during setup* |
+
+### Features Available
+
+- Create Courses
+- Manage Courses
+- Create Lessons
+- View Students
+- Instructor Analytics
+
+---
+
+## 👨‍🎓 Student
+
+| Field | Value |
+|--------|-------|
+| Name | Student |
+| Email | student@test.com |
+| Role | LEARNER |
+| Password | *Use the password configured during setup* |
+
+### Features Available
+
+- Browse Courses
+- Enroll in Courses
+- Access Learning Content
+- AI Learning Assistant
+- My Courses
+
+---
+
+# 📋 Suggested Evaluation Flow
+
+To explore the complete functionality of ScholarFlow, follow the steps below.
+
+### 1. Login as Administrator
+
+- View platform statistics
+- Monitor revenue dashboard
+- Manage users
+- Browse all courses
+- View enrollment analytics
+
+---
+
+### 2. Login as Instructor
+
+- Create a new course
+- Add lessons
+- View enrolled students
+- Monitor instructor analytics
+
+---
+
+### 3. Login as Student
+
+- Browse available courses
+- Enroll in a course
+- Open the learning page
+- Study course lessons
+- Ask questions using the AI Learning Assistant
+
+---
+
+# 🤖 Try the AI Assistant
+
+Example questions:
+
+- What is Radar?
+- Explain Synthetic Aperture Radar.
+- What is Radar Cross Section?
+- Explain Pulse Radar.
+- What is Doppler Radar?
+- What are the applications of Radar?
+
+The AI first searches the available course material and then uses Google Gemini AI to generate an educational response.
+
+---
+
+> **Note**
+>
+> This application is deployed using free-tier cloud services (Vercel, Neon PostgreSQL, and Gemini Free API). The first request after a period of inactivity may take **20–60 seconds** while the services wake up. Subsequent requests are significantly faster.
+
 # 🤖 AI Learning Assistant
 
 ScholarFlow integrates Google Gemini AI.
