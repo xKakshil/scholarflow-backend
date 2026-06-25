@@ -115,7 +115,7 @@ ScholarFlow includes pre-configured accounts for testing different user roles.
 | Name | Kakshil Kumar |
 | Email | test@learner.con |
 | Role | ADMIN |
-| Password | *Use the password configured during setup* |
+| Password | 123456 |
 
 ### Features Available
 
@@ -135,7 +135,7 @@ ScholarFlow includes pre-configured accounts for testing different user roles.
 | Name | Teacher |
 | Email | teacher@test.com |
 | Role | INSTRUCTOR |
-| Password | *Use the password configured during setup* |
+| Password | 123456 |
 
 ### Features Available
 
@@ -154,7 +154,7 @@ ScholarFlow includes pre-configured accounts for testing different user roles.
 | Name | Student |
 | Email | student@test.com |
 | Role | LEARNER |
-| Password | *Use the password configured during setup* |
+| Password | 123456 |
 
 ### Features Available
 
