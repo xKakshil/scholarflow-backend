@@ -1,236 +1,151 @@
 import { NextResponse } from "next/server";
-
 import { prisma } from "@/lib/prisma";
-
-import {
-  GoogleGenerativeAI
-} from "@google/generative-ai";
-
-
-
-
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function POST(req: Request) {
-
-
-console.log("🔥 AI API HIT");
-
-
-try {
-
-
-
-if(!process.env.GEMINI_API_KEY){
-
-
-return NextResponse.json(
-{
-error:"Gemini API key missing"
-},
-{
-status:500
-}
-);
-
-
-}
-
-
-
-
-
-const body =
-await req.json();
-
-
-
-
-
-if(!body.question){
-
-
-return NextResponse.json(
-{
-error:"Question required"
-},
-{
-status:400
-}
-);
-
-
-}
-
-
-
-
-
-
-
-const chunks =
-await prisma.contentChunk.findMany({
-
-
-take:5,
-
-
-where:{
-
-
-content:{
-
-
-contains:
-body.question,
-
-
-mode:"insensitive"
-
-
-}
-
-
-}
-
-
-});
-
-
-
-
-
-
-
-const context =
-chunks
-.map((c)=>c.content)
-.join("\n");
-
-
-
-
-
-
-
-const genAI =
-new GoogleGenerativeAI(
-process.env.GEMINI_API_KEY
-);
-
-
-
-
-
-
-const model =
-genAI.getGenerativeModel({
-
-
-model:"gemini-2.5-flash-lite"
-
-
-});
-
-
-
-
-
-
-
-
-const result =
-await model.generateContent(`
-
-
+  console.log("🔥 AI API HIT");
+
+  try {
+    if (!process.env.GEMINI_API_KEY) {
+      return NextResponse.json(
+        {
+          error: "Gemini API key is missing."
+        },
+        {
+          status: 500
+        }
+      );
+    }
+
+    const body = await req.json();
+
+    if (!body.question?.trim()) {
+      return NextResponse.json(
+        {
+          error: "Question is required."
+        },
+        {
+          status: 400
+        }
+      );
+    }
+
+    const chunks = await prisma.contentChunk.findMany({
+      take: 5,
+      where: {
+        content: {
+          contains: body.question,
+          mode: "insensitive"
+        }
+      }
+    });
+
+    const context =
+      chunks.length > 0
+        ? chunks.map((c) => c.content).join("\n\n")
+        : "No relevant course notes found.";
+
+    const genAI = new GoogleGenerativeAI(
+      process.env.GEMINI_API_KEY
+    );
+
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash-lite"
+    });
+
+    const result = await model.generateContent({
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: `
 You are ScholarFlow AI Tutor.
 
+Instructions:
 
-Rules:
+1. Answer using the COURSE NOTES whenever possible.
+2. If the notes are insufficient, answer using your general knowledge.
+3. If you use knowledge outside the notes, clearly mention:
+   "This explanation includes additional knowledge beyond your course notes."
+4. Never invent course content.
+5. Keep answers concise but educational.
 
-1. Use course notes first.
-2. Explain in simple educational language.
-3. If notes are insufficient, use general knowledge.
-4. Clearly mention when external knowledge is used.
-5. Never create fake course references.
+-------------------------
+COURSE NOTES
+-------------------------
 
+${context}
 
-
-COURSE NOTES:
-
-${context || "No matching course notes found"}
-
-
-
-QUESTION:
+-------------------------
+QUESTION
+-------------------------
 
 ${body.question}
+`
+            }
+          ]
+        }
+      ],
+      generationConfig: {
+        temperature: 0.3,
+        maxOutputTokens: 600
+      }
+    });
 
+    const answer =
+      result.response.text() ||
+      "Sorry, I couldn't generate an answer.";
 
+    return NextResponse.json({
+      answer,
+      sources: chunks
+    });
+  } catch (error: any) {
+    console.error("🔥 AI ERROR:", error);
 
-Answer:
+    const message =
+      error?.message ||
+      JSON.stringify(error);
 
-`);
+    if (
+      message.includes("429") ||
+      message.toLowerCase().includes("quota")
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Gemini AI is temporarily busy because the free quota has been reached. Please wait 30–60 seconds and try again."
+        },
+        {
+          status: 429
+        }
+      );
+    }
 
+    if (
+      message.toLowerCase().includes("api key") ||
+      message.toLowerCase().includes("permission")
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Gemini API key is invalid or missing."
+        },
+        {
+          status: 500
+        }
+      );
+    }
 
-
-
-
-
-
-
-const answer =
-result.response.text();
-
-
-
-
-
-
-
-
-return NextResponse.json({
-
-answer,
-
-sources:chunks
-
-});
-
-
-
-
-
-}
-
-
-
-catch(error:any){
-
-
-
-console.error(
-"🔥 AI ERROR FULL:",
-error
-);
-
-
-
-
-return NextResponse.json(
-{
-
-error:
-error.message || "AI failed"
-
-},
-{
-status:500
-}
-);
-
-
-}
-
-
-
+    return NextResponse.json(
+      {
+        error:
+          "AI service is temporarily unavailable. Please try again in a few seconds."
+      },
+      {
+        status: 500
+      }
+    );
+  }
 }
