@@ -102,41 +102,40 @@ ${body.question}
       sources: chunks
     });
   } catch (error: any) {
-    console.error("🔥 AI ERROR:", error);
 
-    const message =
-      error?.message ||
-      JSON.stringify(error);
+  console.error("🔥 AI ERROR:", error);
 
-    if (
-      message.includes("429") ||
-      message.toLowerCase().includes("quota")
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "Gemini AI is temporarily busy because the free quota has been reached. Please wait 30–60 seconds and try again."
-        },
-        {
-          status: 429
-        }
-      );
+  const message =
+    error?.message || "";
+
+  if (
+    message.includes("429") ||
+    message.toLowerCase().includes("quota")
+  ) {
+
+    return NextResponse.json(
+      {
+        error:
+          "Gemini AI is currently busy because of free-tier limits. Please wait a few seconds and try again."
+      },
+      {
+        status: 429
+      }
+    );
+
+  }
+
+  return NextResponse.json(
+    {
+      error:
+        "AI service is temporarily unavailable. Please wait a few seconds and try again."
+    },
+    {
+      status: 500
     }
+  );
 
-    if (
-      message.toLowerCase().includes("api key") ||
-      message.toLowerCase().includes("permission")
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "Gemini API key is invalid or missing."
-        },
-        {
-          status: 500
-        }
-      );
-    }
+}
 
     return NextResponse.json(
       {
