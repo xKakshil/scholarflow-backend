@@ -67,7 +67,7 @@ Instructions:
 1. Answer using the COURSE NOTES whenever possible.
 2. If the notes are insufficient, answer using your general knowledge.
 3. If you use knowledge outside the notes, clearly mention:
-   "This explanation includes additional knowledge beyond your course notes."
+"This explanation includes additional knowledge beyond your course notes."
 4. Never invent course content.
 5. Keep answers concise but educational.
 
@@ -101,46 +101,49 @@ ${body.question}
       answer,
       sources: chunks
     });
+
   } catch (error: any) {
 
-  console.error("🔥 AI ERROR:", error);
+    console.error("🔥 AI ERROR:", error);
 
-  const message =
-    error?.message || "";
+    const message =
+      error?.message ||
+      JSON.stringify(error);
 
-  if (
-    message.includes("429") ||
-    message.toLowerCase().includes("quota")
-  ) {
-
-    return NextResponse.json(
-      {
-        error:
-          "Gemini AI is currently busy because of free-tier limits. Please wait a few seconds and try again."
-      },
-      {
-        status: 429
-      }
-    );
-
-  }
-
-  return NextResponse.json(
-    {
-      error:
-        "AI service is temporarily unavailable. Please wait a few seconds and try again."
-    },
-    {
-      status: 500
+    if (
+      message.includes("429") ||
+      message.toLowerCase().includes("quota")
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Gemini AI is currently busy because of free-tier limits. Please wait 20–30 seconds and try again."
+        },
+        {
+          status: 429
+        }
+      );
     }
-  );
 
-}
+    if (
+      message.toLowerCase().includes("api key") ||
+      message.toLowerCase().includes("permission")
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Gemini API key is invalid or missing."
+        },
+        {
+          status: 500
+        }
+      );
+    }
 
     return NextResponse.json(
       {
         error:
-          "AI service is temporarily unavailable. Please try again in a few seconds."
+          "AI service is temporarily unavailable. Please wait a few seconds and try again."
       },
       {
         status: 500
